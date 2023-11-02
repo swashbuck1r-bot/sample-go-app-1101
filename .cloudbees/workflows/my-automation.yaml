@@ -6,13 +6,6 @@ on:
     branches:
       - "**"
 jobs:
-  build:
-    steps:
-      - name: Say hello
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world"
   ci-job:
     steps:
       - uses: docker://alpine/git:latest
@@ -28,8 +21,6 @@ jobs:
         uses: docker://golang:1.20
         run: |
           go test -v ./...
-      - name: Scan with SonarQube bundled
-        uses: cloudbees-io/sonarqube-bundled-sast-scan-code@v1
       - name: Set up Docker Hub registry
         uses: cloudbees-io/configure-oci-credentials@v1
         with:
@@ -40,3 +31,9 @@ jobs:
         uses: cloudbees-io/kaniko@v1
         with:
           destination: ${{ vars.DOCKER_USERNAME }}/sample-go-app:1.0.6
+  scan-job:
+    steps:
+      - name: checkout
+        uses: cloudbees-io/checkout@v1
+      - name: Scan with SonarQube
+        uses: cloudbees-io/sonarqube-bundled-sast-scan-code@v1
